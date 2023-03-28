@@ -1,4 +1,4 @@
-# MaskFreeVis
+# MaskFreeVIS
 
 Mask-Free Video Instance Segmentation [CVPR 2023].
 
