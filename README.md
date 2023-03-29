@@ -85,7 +85,7 @@ Citation
 ---------------
 If you find MaskFreeVIS useful in your research or refer to the provided baseline results, please star :star: this repository and consider citing :pencil::
 ```
-@inproceedings{transfiner,
+@inproceedings{maskfreevis,
     author={Ke, Lei and Danelljan, Martin and Ding, Henghui and Tai, Yu-Wing and Tang, Chi-Keung and Yu, Fisher},
     title={Mask-Free Video Instance Segmentation},
     booktitle = {CVPR},
