@@ -7,8 +7,8 @@ This is the official pytorch implementation of [MaskFreeVIS](https://github.com/
 Highlights
 -----------------
 - **High-performing** video instance segmentation **without using any** video masks or even image mask labels on all datasets. Using ResNet-50 and built on Mask2Former, MaskFreeVIS achieves 46.6 AP without using video masks, and 42.5 AP without any masks on YTVIS 2019.
-- **Novelty:**: a new **parameter-free** Temporal KNN-patch Loss (TK-Loss), which leverages temporal masks consistency using unsupervised one-to-k patch correspondence.
-- **Simple:** TK-Loss is flexible to intergrated with state-of-the-art transformer-based VIS models, with no trainable parameters.
+- **Novelty**: a new **parameter-free** Temporal KNN-patch Loss (TK-Loss), which leverages temporal masks consistency using unsupervised one-to-k patch correspondence.
+- **Simple:** TK-Loss is flexible to be intergrated with state-of-the-art transformer-based VIS models, with no trainable parameters.
 
 Visualization results of MaskFreeVIS
 -----------------
