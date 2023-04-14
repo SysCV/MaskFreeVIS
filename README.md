@@ -2,7 +2,8 @@
 
 Mask-Free Video Instance Segmentation [CVPR 2023].
 
-This is the official pytorch implementation of [MaskFreeVIS](https://github.com/SysCV/MaskFreeVis/) built on the open-source detectron2. 
+This is the official pytorch implementation of [MaskFreeVIS](https://github.com/SysCV/MaskFreeVis/) built on the open-source detectron2. We aim to **remove the necessity for expensive video masks and even image masks** for training VIS models.
+
 
 > [**Mask-Free Video Instance Segmentation**](https://arxiv.org/abs/2303.15904)           
 > Lei Ke, Martin Danelljan, Henghui Ding, Yu-Wing Tai, Chi-Keung Tang, Fisher Yu \
