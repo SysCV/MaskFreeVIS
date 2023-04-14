@@ -1,0 +1,12 @@
+_BASE_: video_maskformer2_R50_bs16_8ep.yaml
+OUTPUT_DIR: './r101_coco_joint/'
+MODEL:
+  WEIGHTS: "pretrained_model/model_final_eba159.pkl"
+  RESNETS:
+    DEPTH: 101
+    STEM_TYPE: "basic"  # not used
+    STEM_OUT_CHANNELS: 64
+    STRIDE_IN_1X1: False
+    OUT_FEATURES: ["res2", "res3", "res4", "res5"]
+    # NORM: "SyncBN"
+    RES5_MULTI_GRID: [1, 1, 1]  # not used
