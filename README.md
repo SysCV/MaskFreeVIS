@@ -103,6 +103,7 @@ Using COCO image masks **without YTVIS video masks** during training:
 <th valign="bottom">AP</th>
 <th valign="bottom">download</th>
 <th valign="bottom">Training Script</th>
+<th valign="bottom">COCO Init Weight</th>
 <!-- TABLE BODY -->
 <!-- ROW: maskformer2_R50_bs16_50ep -->
  <tr><td align="left"><a href="configs/youtubevis_2019/video_maskformer2_R50_bs16_8ep.yaml">MaskFreeVIS</a></td>
@@ -110,6 +111,7 @@ Using COCO image masks **without YTVIS video masks** during training:
 <td align="center">46.6</td>
 <td align="center"><a href="https://drive.google.com/file/d/1Jjq-YgHqwixs2AdJ3kSNp4d2DjjV5qEA/view?usp=share_link">model</a></td>
 <td align="center"><a href="scripts/train_8gpu_mask2former_r50_video.sh">script</a></td>
+<td align="center"><a href="https://dl.fbaipublicfiles.com/maskformer/mask2former/coco/instance/maskformer2_R50_bs16_50ep/model_final_3c8ec9.pkl">Init</a></td>
 </tr>
 
 <!-- ROW: maskformer2_R101_bs16_50ep -->
@@ -118,17 +120,20 @@ Using COCO image masks **without YTVIS video masks** during training:
 <td align="center">49.1</td>
 <td align="center"><a href="https://drive.google.com/file/d/1eo05Rdl5cgTEB0mxB2HLwQGhEu6vEwDu/view?usp=share_link">model</a></td>
 <td align="center"><a href="scripts/train_8gpu_mask2former_r101_video.sh">script</a></td>
+<td align="center"><a href="https://dl.fbaipublicfiles.com/maskformer/mask2former/coco/instance/maskformer2_R101_bs16_50ep/model_final_eba159.pkl">Init</a></td>
 </tr>
+
 <!-- ROW: maskformer2_swin_base_IN21k_384_bs16_50ep -->
  <tr><td align="left"><a href="configs/youtubevis_2019/swin/video_maskformer2_swin_large_IN21k_384_bs16_8ep.yaml">MaskFreeVIS</a></td>
 <td align="center">Swin-L</td>
 <td align="center">56.0</td>
 <td align="center"><a href="https://drive.google.com/file/d/1kvckNoaDftN5R16CRJ-izfHeKTl_rskt/view?usp=share_link">model</a></td>
 <td align="center"><a href="scripts/train_8gpu_mask2former_swinl_video.sh">script</a></td>
+<td align="center"><a href="https://dl.fbaipublicfiles.com/maskformer/mask2former/coco/instance/maskformer2_swin_large_IN21k_384_bs16_100ep/model_final_e5f453.pkl">Init</a></td>
 </tr>
 </tbody></table>
 
-**For below two training settings without using  pseudo COCO images masks** for joint training, please change the folder to:
+**For below two training settings without using pseudo COCO images masks** for joint video training, please change the folder to:
 ```
 cd mfvis_nococo
 ```
@@ -142,6 +147,7 @@ cd mfvis_nococo
 <th valign="bottom">AP</th>
 <th valign="bottom">download</th>
 <th valign="bottom">Training Script</th>
+<th valign="bottom">COCO Init Weight</th>
 <!-- TABLE BODY -->
 <!-- ROW: maskformer2_R50_bs16_50ep -->
  <tr><td align="left"><a href="mfvis_nococo/configs/youtubevis_2019/video_maskformer2_R50_bs16_8ep_coco.yaml">MaskFreeVIS</a></td>
@@ -149,6 +155,7 @@ cd mfvis_nococo
 <td align="center">43.8</td>
 <td align="center"><a href="https://drive.google.com/file/d/1hAfGtRk5uxYj9BPX3PGPjufyiF5l0IsW/view?usp=share_link">model</a></td>
 <td align="center"><a href="mfvis_nococo/scripts/train_8gpu_mask2former_r50_video_coco.sh">script</a></td>
+<td align="center"><a href="https://dl.fbaipublicfiles.com/maskformer/mask2former/coco/instance/maskformer2_R50_bs16_50ep/model_final_3c8ec9.pkl">Init</a></td>
 </tr>
 <!-- ROW: maskformer2_R101_bs16_50ep -->
  <tr><td align="left"><a href="mfvis_nococo/configs/youtubevis_2019/video_maskformer2_R101_bs16_8ep_coco.yaml">MaskFreeVIS</a></td>
@@ -156,6 +163,7 @@ cd mfvis_nococo
 <td align="center">47.3</td>
 <td align="center"><a href="https://drive.google.com/file/d/1imHH-m9Q9YkJBzEe2MD0ewypjJdfdMZZ/view?usp=share_link">model</a></td>
 <td align="center"><a href="mfvis_nococo/scripts/train_8gpu_mask2former_r101_video_coco.sh">script</a></td>
+<td align="center"><a href="https://dl.fbaipublicfiles.com/maskformer/mask2former/coco/instance/maskformer2_R101_bs16_50ep/model_final_eba159.pkl">Init</a></td>
 </tr>
 <!-- ROW: maskformer2_swin_base_IN21k_384_bs16_50ep -->
 </tbody></table>
@@ -169,6 +177,7 @@ cd mfvis_nococo
 <th valign="bottom">AP</th>
 <th valign="bottom">download</th>
 <th valign="bottom">Training Script</th>
+<th valign="bottom">COCO Box Init Weight</th>
 <!-- TABLE BODY -->
 <!-- ROW: maskformer2_R50_bs16_50ep -->
  <tr><td align="left"><a href="mfvis_nococo/configs/youtubevis_2019/video_maskformer2_R50_bs16_8ep.yaml">MaskFreeVIS</a></td>
@@ -176,6 +185,7 @@ cd mfvis_nococo
 <td align="center">42.5</td>
 <td align="center"><a href="https://drive.google.com/file/d/1F5VZPxR4637JmFu3t4WaKgvWs4WSxPPl/view?usp=share_link">model</a></td>
 <td align="center"><a href="mfvis_nococo/scripts/train_8gpu_mask2former_r50_video.sh">script</a></td>
+<td align="center"><a href="https://drive.google.com/file/d/1qiFBqFK0VEgdj0ulylEqNKGExSguGc8V/view?usp=share_link">Init</a></td>
 </tr>
 </tbody></table>
 
