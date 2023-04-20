@@ -108,8 +108,6 @@ if __name__ == "__main__":
         print('args input:', args.input)
         args.input = args.input[0]
         for file_name in os.listdir(args.input):
-            if file_name not in ['1ab5f4bbc5', '0e487d0704', '1c21edce1f','19904980af', '0d284ff4c2', '152fe4902a', '0c04834d61', '7836afc0c2', '69c0f7494e', '7775043b5e', '6ca84fa2b7', '41f6d1f137', '4037d8305d', '2ac37d171d', '2e21c7e59b', '19cde15c4b', '20a93b4c54', '33e8066265', '4b31a18d91', 'ff14721af5', 'b7b7e52e02', 'b4e75872a0', '97b38cabcc']:
-                continue
             input_path_list = sorted([args.input + file_name + '/' + f for f in os.listdir(args.input + file_name)])
             print('input path list:', input_path_list)
             if len(input_path_list) == 0:
