@@ -25,6 +25,9 @@ import os
 
 from pycocotools import mask as coco_mask
 
+from maskfreevis.data_fusion_modeling import extract_optical_flow_dense_matrix
+
+
 __all__ = ["YTVISDatasetMapper", "CocoClipDatasetMapper"]
 
 def seed_everything(seed):
@@ -156,6 +159,7 @@ class YTVISDatasetMapper:
         num_classes: int = 40,
         src_dataset_name: str = "",
         tgt_dataset_name: str = "",
+        data_fusion_block_status: bool = False,
     ):
         """
         NOTE: this interface is experimental.
@@ -175,6 +179,7 @@ class YTVISDatasetMapper:
         self.sampling_frame_range   = sampling_frame_range
         self.sampling_frame_shuffle = sampling_frame_shuffle
         self.num_classes            = num_classes
+        self.data_fusion_block_status = data_fusion_block_status
 
         if not is_tgt:
             self.src_metadata = MetadataCatalog.get(src_dataset_name)
@@ -212,6 +217,7 @@ class YTVISDatasetMapper:
         sampling_frame_num = cfg.INPUT.SAMPLING_FRAME_NUM
         sampling_frame_range = cfg.INPUT.SAMPLING_FRAME_RANGE
         sampling_frame_shuffle = cfg.INPUT.SAMPLING_FRAME_SHUFFLE
+        data_fusion_block_status = cfg.MODEL.DATAFUSION.STATUS
 
         ret = {
             "is_train": is_train,
@@ -224,6 +230,7 @@ class YTVISDatasetMapper:
             "sampling_frame_shuffle": sampling_frame_shuffle,
             "num_classes": cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES,
             "tgt_dataset_name": cfg.DATASETS.TRAIN[-1],
+            "data_fusion_block_status": data_fusion_block_status,
         }
 
         return ret
@@ -273,12 +280,25 @@ class YTVISDatasetMapper:
         dataset_dict["image"] = []
         dataset_dict["instances"] = []
         dataset_dict["file_names"] = []
+        dataset_dict["optical_flow"] = []
         for frame_idx in selected_idx:
             dataset_dict["file_names"].append(file_names[frame_idx])
 
             # Read image
             image = utils.read_image(file_names[frame_idx], format=self.image_format)
             utils.check_image_size(dataset_dict, image)
+
+            if self.data_fusion_block_status:
+                prev_image = utils.read_image(file_names[frame_idx - 1], format=self.image_format)
+                utils.check_image_size(dataset_dict, prev_image)
+
+                optical_flow_matrix = extract_optical_flow_dense_matrix(prev_image, image)
+                
+                optical_flow_aug_input = T.AugInput(optical_flow_matrix)
+                optical_flow_transforms = self.augmentations(optical_flow_aug_input)
+                optical_flow_matrix = optical_flow_aug_input.image
+
+                dataset_dict["optical_flow"].append(torch.as_tensor(np.ascontiguousarray(optical_flow_matrix.transpose(2, 0, 1))))
 
             aug_input = T.AugInput(image)
             transforms = self.augmentations(aug_input)

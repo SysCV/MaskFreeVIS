@@ -148,7 +148,10 @@ def _get_ytvis_2021_instances_meta():
 
 
 def load_ytvis_json(json_file, image_root, dataset_name=None, extra_annotation_keys=None):
-    from .ytvis_api.ytvos import YTVOS
+    try:
+        from .ytvis_api.ytvos import YTVOS
+    except:
+        from ytvis_api.ytvos import YTVOS
 
     timer = Timer()
     json_file = PathManager.get_local_path(json_file)

@@ -21,6 +21,8 @@ from skimage import color
 import cv2
 import numpy as np
 
+from maskfreevis.data_fusion_modeling import DataFusionBlock, build_optical_flow_fusion_block
+
 def unfold_wo_center(x, kernel_size, dilation):
     assert x.dim() == 4
     assert kernel_size % 2 == 1
@@ -133,6 +135,7 @@ class VideoMaskFormer(nn.Module):
         pixel_std: Tuple[float],
         # video
         num_frames,
+        data_fusion_block: DataFusionBlock
     ):
         """
         Args:
@@ -159,6 +162,7 @@ class VideoMaskFormer(nn.Module):
             test_topk_per_image: int, instance segmentation parameter, keep topk instances per image
         """
         super().__init__()
+        self.data_fusion_block = data_fusion_block
         self.backbone = backbone
         self.sem_seg_head = sem_seg_head
         self.criterion = criterion
@@ -179,6 +183,7 @@ class VideoMaskFormer(nn.Module):
 
     @classmethod
     def from_config(cls, cfg):
+        data_fusion_block = build_optical_flow_fusion_block(cfg)
         backbone = build_backbone(cfg)
         sem_seg_head = build_sem_seg_head(cfg, backbone.output_shape())
 
@@ -235,6 +240,7 @@ class VideoMaskFormer(nn.Module):
             "pixel_std": cfg.MODEL.PIXEL_STD,
             # video
             "num_frames": cfg.INPUT.SAMPLING_FRAME_NUM,
+            "data_fusion_block": data_fusion_block
         }
 
     @property
@@ -267,10 +273,14 @@ class VideoMaskFormer(nn.Module):
                         Each dict contains keys "id", "category_id", "isthing".
         """
         images = []
-        
+        optical_flow_matrixes = []
+
         for video in batched_inputs:
             for frame in video["image"]:
                 images.append(frame.to(self.device))
+
+            for optical_flow_matrix in video["optical_flow"]:
+                optical_flow_matrixes.append(optical_flow_matrix.to(self.device))
 
         is_coco = (len(images) == 8) or (len(images) == 4)# change here, 4 is for swinl with bs 1 which cannot afford batch size 2
         if self.training and not is_coco:
@@ -288,7 +298,13 @@ class VideoMaskFormer(nn.Module):
         images = [(x - self.pixel_mean) / self.pixel_std for x in images]
         images = ImageList.from_tensors(images, self.size_divisibility)
 
-        features = self.backbone(images.tensor)
+        fusioned_tensor = images.tensor
+        if self.data_fusion_block is not None:
+            optical_flow_matrixes = [(x - self.pixel_mean) / self.pixel_std for x in optical_flow_matrixes]
+            optical_flow_matrixes = ImageList.from_tensors(optical_flow_matrixes, self.size_divisibility)
+            fusioned_tensor = self.data_fusion_block(images.tensor, optical_flow_matrixes.tensor)
+
+        features = self.backbone(fusioned_tensor)
         outputs = self.sem_seg_head(features)
 
         if self.training:
@@ -389,7 +405,7 @@ class VideoMaskFormer(nn.Module):
 
             pred_masks = pred_masks[:, :, : img_size[0], : img_size[1]]
             pred_masks = F.interpolate(
-                pred_masks, size=(output_height, output_width), mode="bilinear", align_corners=False
+                pred_masks, size=(int(output_height), int(output_width)), mode="bilinear", align_corners=False
             )
 
             masks = pred_masks > 0.

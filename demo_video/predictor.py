@@ -5,15 +5,22 @@ import multiprocessing as mp
 from collections import deque
 import cv2
 import torch
-from visualizer import TrackVisualizer
+import copy
 from detectron2.data import MetadataCatalog
 from detectron2.engine.defaults import DefaultPredictor
 from detectron2.structures import Instances
 from detectron2.utils.video_visualizer import VideoVisualizer
-from detectron2.utils.visualizer import ColorMode
+from detectron2.utils.visualizer import ColorMode, Visualizer
+from maskfreevis.data_fusion_modeling import extract_optical_flow_dense_matrix
+
+try:
+    from .visualizer import TrackVisualizer
+except:
+    from visualizer import TrackVisualizer
+
 
 class VisualizationDemo(object):
-    def __init__(self, cfg, instance_mode=ColorMode.IMAGE, parallel=False):
+    def __init__(self, cfg, metadata=None, instance_mode=ColorMode.IMAGE, parallel=False):
         """
         Args:
             cfg (CfgNode):
@@ -24,6 +31,8 @@ class VisualizationDemo(object):
         self.metadata = MetadataCatalog.get(
             cfg.DATASETS.TEST[0] if len(cfg.DATASETS.TEST) else "__unused"
         )
+        if metadata is not None:
+            self.metadata = metadata
         self.cpu_device = torch.device("cpu")
         self.instance_mode = instance_mode
         self.parallel = parallel
@@ -87,6 +96,10 @@ class VideoPredictor(DefaultPredictor):
         inputs = cv2.imread("input.jpg")
         outputs = pred(inputs)
     """
+    def __init__(self, cfg):
+        super().__init__(cfg)
+        self.data_fusion_status = cfg.MODEL.DATAFUSION.STATUS
+
     def __call__(self, frames):
         """
         Args:
@@ -96,18 +109,35 @@ class VideoPredictor(DefaultPredictor):
                 the output of the model for one image only.
                 See :doc:`/tutorials/models` for details about the format.
         """
-        with torch.no_grad():  # https://github.com/sphinx-doc/sphinx/issues/4258
+        with torch.inference_mode():  # https://github.com/sphinx-doc/sphinx/issues/4258
             input_frames = []
-            for original_image in frames:
+            optical_flow_matrixes = []
+            for image_idx, original_image in enumerate(frames):
                 # Apply pre-processing to image.
                 if self.input_format == "RGB":
                     # whether the model expects BGR inputs or RGB
+                    prev_frame = copy.deepcopy(frames[image_idx - 1])
+                    current_frame = copy.deepcopy(frames[image_idx])
                     original_image = original_image[:, :, ::-1]
+                else:
+                    prev_frame = copy.deepcopy(frames[image_idx - 1][:, :, ::-1])
+                    current_frame = copy.deepcopy(frames[image_idx][:, :, ::-1])
+            
+                if self.data_fusion_status:
+                    optical_flow_matrix = extract_optical_flow_dense_matrix(prev_frame, current_frame)
+                    optical_flow_matrix = self.aug.get_transform(optical_flow_matrix).apply_image(optical_flow_matrix)
+                    optical_flow_matrix = torch.as_tensor(optical_flow_matrix.astype("float32").transpose(2, 0, 1))
+                    optical_flow_matrixes.append(optical_flow_matrix)
+                else:
+                    del prev_frame
+                    del current_frame
+
                 height, width = original_image.shape[:2]
                 image = self.aug.get_transform(original_image).apply_image(original_image)
                 image = torch.as_tensor(image.astype("float32").transpose(2, 0, 1))
                 input_frames.append(image)
-            inputs = {"image": input_frames, "height": height, "width": width}
+
+            inputs = {"image": input_frames, "height": height, "width": width, "optical_flow": optical_flow_matrixes}
             predictions = self.model([inputs])
             return predictions
 

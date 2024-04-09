@@ -17,6 +17,7 @@ MODEL:
 DATASETS:
   TRAIN: ("coco_2017_train_fake", "ytvis_2019_train",)
   TEST: ("ytvis_2019_val",)
+  DATASET_RATIO: (1.0,)
 SOLVER:
   IMS_PER_BATCH: 16
   BASE_LR: 0.0001

@@ -22,6 +22,9 @@ from mask2former import add_maskformer2_config
 from mask2former_video import add_maskformer2_video_config
 from predictor import VisualizationDemo
 import imageio
+import random
+from maskfreevis.config import get_cfg
+from maskfreevis.data_fusion_modeling import add_data_fusion_block_config
 
 # constants
 WINDOW_NAME = "mask2former video demo"
@@ -31,6 +34,7 @@ def setup_cfg(args):
     add_deeplab_config(cfg)
     add_maskformer2_config(cfg)
     add_maskformer2_video_config(cfg)
+    add_data_fusion_block_config(cfg)
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
     cfg.freeze()
@@ -107,14 +111,14 @@ if __name__ == "__main__":
         #     assert args.input, "The input path(s) was not found"
         print('args input:', args.input)
         args.input = args.input[0]
-        for file_name in os.listdir(args.input):
+        for file_name in random.sample(os.listdir(args.input), 20):
             input_path_list = sorted([args.input + file_name + '/' + f for f in os.listdir(args.input + file_name)])
             print('input path list:', input_path_list)
             if len(input_path_list) == 0:
                 continue 
             vid_frames = []
             for path in input_path_list:
-                img = read_image(path, format="BGR")
+                img = read_image(path, format=cfg.INPUT.FORMAT)
                 vid_frames.append(img)
             start_time = time.time()
             with autocast():

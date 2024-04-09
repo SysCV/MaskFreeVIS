@@ -96,7 +96,7 @@ def masks_to_boxes_new(masks: torch.Tensor) -> torch.Tensor:
     hMask = torch.logical_or(torch.arange(h).unsqueeze(0).to(boxes)<boxes[:, 1, None], torch.arange(h).unsqueeze(0).to(boxes)>=boxes[:, 3, None])
     wMask = torch.logical_or(torch.arange(w).unsqueeze(0).to(boxes)<boxes[:, 0, None], torch.arange(w).unsqueeze(0).to(boxes)>=boxes[:, 2, None])
     
-    mem_mask = torch.logical_or(hMask.unsqueeze(2), wMask.unsqueeze(1)).float()
+    mem_mask = torch.bitwise_or(hMask.unsqueeze(2), wMask.unsqueeze(1)).float()
     # print('mem mask shape:', mem_mask.shape)
     mem_mask = 1.0 - mem_mask.view(n, -1, masks.shape[-2], masks.shape[-1])
     return mem_mask

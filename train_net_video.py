@@ -75,6 +75,10 @@ class Trainer(DefaultTrainer):
 
     @classmethod
     def build_train_loader(cls, cfg):
+        assert len(cfg.DATASETS.TRAIN) == len(cfg.DATASETS.DATASET_RATIO), (
+            f"cfg.DATASETS.TRAIN length and cfg.DATASETS.DATASET_RATIO length should be equal, "
+            f"{len(cfg.DATASETS.TRAIN)} != {len(cfg.DATASETS.DATASET_RATIO)}")
+        
         mappers = []
         for d_i, dataset_name in enumerate(cfg.DATASETS.TRAIN):
             if dataset_name.startswith('coco'):
@@ -92,8 +96,7 @@ class Trainer(DefaultTrainer):
                 build_detection_train_loader(cfg, mapper=mapper, dataset_name=dataset_name)
                 for mapper, dataset_name in zip(mappers, cfg.DATASETS.TRAIN)
         ]
-        DATASET_RATIO = [1.0, 0.75]
-        combined_data_loader = build_combined_loader(cfg, loaders, DATASET_RATIO)
+        combined_data_loader = build_combined_loader(cfg, loaders, cfg.DATASETS.DATASET_RATIO)
         return combined_data_loader
 
         
